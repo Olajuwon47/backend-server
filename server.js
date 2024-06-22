@@ -1,14 +1,32 @@
-  const express = require ('express');
+const express = require ('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt-nodejs');
 const { hash } = require('bcrypt-nodejs');
 const cors = require('cors')
+const knex = require('knex');
+const db = knex({
+  client: 'pg',
+  connection: {
+    host: '127.0.0.1',
+    port: 5530,
+    user: 'postgres',
+    password: '',
+    database: 'face-detection',
+  },
+ userParams: {
+    userParam1: '451',
+  },
+});
+/*db.select('*').from('users').then(data =>{
+   console.log(data);
+});*/
+
 const app = express();
 app.use(express.json());
 const database ={
     users:[
        {
-        id:'123',
+        id:'11',
         name:'jay',
         email:'jay@gmail.com',
         password:'ola9!56&%',
@@ -16,7 +34,7 @@ const database ={
         joined: new Date()
        }, 
        {
-        id:'45',
+        id:'12',
         name:'lola',
         email:'lola@gmail.com',
         password:'6$la!56&%',
@@ -24,7 +42,7 @@ const database ={
         joined: new Date()
        }, 
        {
-        id:'39',
+        id:'13',
         name:'duppy',
         email:'duppy@gmail.com',
         password:'hj!987&%',
@@ -41,7 +59,7 @@ const database ={
     ]
 } 
 app.use(bodyParser.json());
-app.use(cors())
+app.use(cors());
 app.get('/',(_req, res)=>{
     res.send(database.users);
 })
@@ -51,7 +69,7 @@ app.post('/signin',(req, res)=>{
     // res == true
     console.log('first guess', res)
 });
-bcrypt.compare("veggies",'$2a$10$.x1eL/c.vUkA5ZvLaluWRuK1Z2feivTSZAIKnOkYeX8N0bKAjE8WS' , function(_err, res) {
+bcrypt.compare("veggies",'$2a$10$.x1eL/c.vUkA5ZvLaluWR  uK1Z2feivTSZAIKnOkYeX8N0bKAjE8WS' , function(_err, res) {
     // res = false
     console.log('second guess', res)
 });*/
@@ -64,7 +82,18 @@ bcrypt.compare("veggies",'$2a$10$.x1eL/c.vUkA5ZvLaluWRuK1Z2feivTSZAIKnOkYeX8N0bK
 
 app.post('/signup',(req, res)=>{
     const {email, name, password} =req.body;
-   bcrypt.hash(password, null, null, function(_err, hash) {
+    db('users')
+    .returning('*')
+    .insert({
+        email:email,
+        name:name,
+        password:password,
+        joined: new Date()
+    })
+    .then(user=>{
+        res.json(user[0]); 
+    })
+  /* bcrypt.hash(password, null, null, function(_err, hash) {
         // Store hash in your password DB.
         console.log(hash);
     });
@@ -75,27 +104,34 @@ app.post('/signup',(req, res)=>{
         password:password,
         entries:0,
         joined: new Date()
-    })
-    res.json(database.users[database.users.length-2])
+    })*/
+   // res.json(database.users[database.users.length-2])
+   .catch(err => res.status(400).json('unable to signup' ))
 })
 
 app.get('/profile/:id',(req, res)=> {
     const { id }= req.params;
-    let found = false;
-    database.users.map(user => { //forEach
+    /*database.users.forEach(user => { //forEach
         if(user.id === id){
          found = true;   
         return res.json(user);
 }
-    })
-    if (!found){
-    res.status(404).json('not found');
+    })*/
+db.select('*').from('users').where({ id })
+.then(user =>{
+    //console.log(user)
+    if (user.length) {
+        res.json(user[0])
+}else{
+    res.status(400).json('not found')
 }
 })
-app.post('/image',(req, res)=> {
+   .catch(err => res.status(400).json('error getting user'))
+})
+app.put('/image',(req, res)=> {
     const { id }= req.body;
-    let found = false;
-    database.users.map(user => { //forEach
+  /*  let found = false;
+    database.users.forEach(user => { //forEach
         if(user.id === id){
          found = true; 
        user.entries++    
@@ -104,7 +140,18 @@ app.post('/image',(req, res)=> {
     })
     if (!found){
     res.status(404).json('not found');
-}
+}*/
+db.where('id', '=', id) 
+.increment('entries', 1)
+.returning('entries')
+.then(entries => {
+  // If you are using knex.js version 1.0.0 or higher this now returns an array of objects. Therefore, the code goes from:
+  // entries[0] --> this used to return the entries
+  // TO
+  // entries[0].entries --> this now returns the entries
+  res.json(entries[0].entries);
+})
+.catch(err => res.status(400).json('unable to get entries'))
 })
 //bcrypt.hash("bacon", null, null, function(err, hash) {
     // Store hash in your password DB.
