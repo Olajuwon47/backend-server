@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt-nodejs');
 const { hash } = require('bcrypt-nodejs');
 const cors = require('cors')
 const knex = require('knex');
+const { user } = require('pg/lib/defaults');
 const db = knex({
   client: 'pg',
   connection: {
@@ -73,26 +74,48 @@ bcrypt.compare("veggies",'$2a$10$.x1eL/c.vUkA5ZvLaluWR  uK1Z2feivTSZAIKnOkYeX8N0
     // res = false
     console.log('second guess', res)
 });*/
-    if (req.body.email === database.users[0].email && req.body.password === database.users[0].password){
+db.select('email','hash').from('login')
+where('email', '=', req.body.email)
+.then(data=>{
+    const isValid =bcrypt.compareSync(req.body.password, data[0].hash);
+    console.log(isValid);
+if (isValid){
+    return db.select('*').from('users')
+    .where('email', '=', req.body.email)
+    .then(user=>{
+        console.log(user);
+    res.status(user[0])
+})
+   /* if (req.body.email === database.users[0].email && req.body.password === database.users[0].password){
     res.json('success');
+}else {*/
+.catch(err =>res.status(400).json('unable to get user'))
 }else {
-    res.status(400).json('error loggging in');
-}
+ res.status(400).json('error loggging in');
+} 
+})
+.catch(err =>res.status(400).json('unable to get user'));
 })
 
 app.post('/signup',(req, res)=>{
     const {email, name, password} =req.body;
-    db('users')
-    .returning('*')
-    .insert({
-        email:email,
-        name:name,
-        password:password,
-        joined: new Date()
-    })
-    .then(user=>{
-        res.json(user[0]); 
-    })
+    const hash = bcrypt.hashSync(password);
+    db.transaction(trx => {
+      trx.insert({
+        hash: hash,
+        email: email
+      })
+      .into('login')
+      .returning('email')
+      .then(async loginEmail => {
+        const user = await trx('users')
+              .returning('*')
+              .insert({
+                  email: loginEmail[0],
+                  name: name,
+                  joined: new Date()
+              });
+          res.json(user[0]);
   /* bcrypt.hash(password, null, null, function(_err, hash) {
         // Store hash in your password DB.
         console.log(hash);
@@ -106,6 +129,10 @@ app.post('/signup',(req, res)=>{
         joined: new Date()
     })*/
    // res.json(database.users[database.users.length-2])
+})
+.then(trx.commit)
+.catch(trx.rollback)
+})
    .catch(err => res.status(400).json('unable to signup' ))
 })
 
