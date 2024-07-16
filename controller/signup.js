@@ -1,4 +1,4 @@
-(req, res)=>{
+ const handleSignup=(req, res, db, bcrypt)=>{
     const {email, name, password} =req.body;
     const hash = bcrypt.hashSync(password);
     db.transaction(trx => {
@@ -36,3 +36,6 @@
 })
    .catch(err => res.status(400).json('unable to signup' ))
 }
+module.exports={
+    handleSignup:handleSignup
+    };
