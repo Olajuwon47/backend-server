@@ -74,7 +74,8 @@ app.get('/',(_req, res)=>{
 app.post('/signin',signin.handleSignin (db, bcrypt ))
 app.post('/signup',(req, res)=>{ signup.handleSignup (req, res, db, bcrypt )})
 app.get('/profile/:id',(req, res)=> {profile.handleProfileGet(req, res, db)})
-app.put('/image',(req, res)=> {image.handleImage(req, res, db)})
+app.put('/image',(req, res)=> {image.handleApicall(req, res, db)})
+app.post('/imageurl',(req, res)=> {image.handleApicall(req, res, db)})
 //bcrypt.hash("bacon", null, null, function(err, hash) {
     // Store hash in your password DB.
 //});

@@ -1,3 +1,14 @@
+const Clarifai =require ('clarifai');
+const app = new Clarifai.App({
+  apiKey: '8a56ebb4735c41ee860174ba7261ebc4'
+ });
+ const handleApicall=(req, res)=>{
+ app.models.predict('face-detection', this.state.input)
+ .then(data =>{
+  res.json(data);
+})
+.catch(err => res.status(400).json('unable to work with Api'))
+}
  const handleImage=(req, res, db)=> {
     const { id }= req.body;
   /*  let found = false;
@@ -24,5 +35,6 @@ db('users').where('id', '=', id)
 .catch(err => res.status(400).json('unable to get entries'))
 }
 module.exports={
-    handleImage
+    handleImage,
+    handleApicall
     };

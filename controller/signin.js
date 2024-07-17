@@ -1,4 +1,8 @@
 const handleSignin=(db, bcrypt )=>(req, res)=>{
+    const {email, password} =req.body;
+    if(!email|| !password){
+        return res.status(400).json('incorrect form submission')
+      }
     /*bcrypt.compare("hj!987&%",'$2a$10$.x1eL/c.vUkA5ZvLaluWRuK1Z2feivTSZAIKnOkYeX8N0bKAjE8WS',
      function(_err, res) {
         // res == true
@@ -9,12 +13,12 @@ const handleSignin=(db, bcrypt )=>(req, res)=>{
         console.log('second guess', res)
     });*/
     db.select('email','hash').from('login')
-    .where('email', '=', req.body.email)
+    .where('email', '=', email)
     .then(data=>{
         const isValid =bcrypt.compareSync(req.body.password, data[0].hash);
     if (isValid){
         return db.select('*').from('users')
-        .where('email', '=', req.body.email)
+        .where('email', '=',email)
         .then(user=>{
         res.status(user[0])
     })
