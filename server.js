@@ -70,7 +70,7 @@ app.get('/',(_req, res)=>{
       } catch (error) {
         res.status(500).send(error.message);
       }*/
-    res.send(database.users)})
+    res.send('It is working!!')})
 app.post('/signin',signin.handleSignin (db, bcrypt ))
 app.post('/signup',(req, res)=>{ signup.handleSignup (req, res, db, bcrypt )})
 app.get('/profile/:id',(req, res)=> {profile.handleProfileGet(req, res, db)})
@@ -87,8 +87,8 @@ bcrypt.compare("bacon", hash, function(err, res) {
 bcrypt.compare("veggies", hash, function(err, res) {
     // res = false
 });*/
-app.listen(3000, ()=> {
-    console.log('app is running on a port 3000')
+app.listen(process.env.port|| 3000, ()=> {
+    console.log('app is running on port ${process.env.port}')
 });
 
 /*
