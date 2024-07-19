@@ -22,7 +22,7 @@
           .then( user=> {
           res.json(user[0]);
   /* bcrypt.hash(password, null, null, function(_err, hash) {
-        // Store hash in your password DB.
+         Store hash in your password DB.
         console.log(hash);
     });
     database.users.push({

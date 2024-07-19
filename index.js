@@ -9,16 +9,18 @@ const profile= require('./controller/profile.js');
 const image= require('./controller/image.js');
 const db = knex({
   client: 'pg',
-  connection: {
-    host: '127.0.0.1',
-    port: 5533,
-    user: 'postgres',
-    password: '',
-    database: 'face-detection',
-  },
- userParams: {
-    userParam1: '451',
-  },
+connection: {
+  connectionString: process.env.DATABASE_URL,
+  ssl:{rejectUnauthorized:false},
+  host:process.env.DATABASE_HOST,
+  port: 5432,
+  user:process.env.DATABASE_USER ,
+  password: process.env.DATABASE_PW,
+  database: process.env.DATABASE_DB,
+},
+userParams: {
+  userParam1: '451',
+},
 });
 /*db.select('*').from('users').then(data =>{
    console.log(data);
@@ -74,7 +76,7 @@ app.get('/',(_req, res)=>{
 app.post('/signin',signin.handleSignin (db, bcrypt ))
 app.post('/signup',(req, res)=>{ signup.handleSignup (req, res, db, bcrypt )})
 app.get('/profile/:id',(req, res)=> {profile.handleProfileGet(req, res, db)})
-app.put('/image',(req, res)=> {image.handleApicall(req, res, db)})
+app.put('/image',(req, res)=> {image.handleImage(req, res, db)})
 app.post('/imageurl',(req, res)=> {image.handleApicall(req, res, db)})
 //bcrypt.hash("bacon", null, null, function(err, hash) {
     // Store hash in your password DB.

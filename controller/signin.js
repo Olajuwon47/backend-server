@@ -5,7 +5,7 @@ const handleSignin=(db, bcrypt )=>(req, res)=>{
       }
     /*bcrypt.compare("hj!987&%",'$2a$10$.x1eL/c.vUkA5ZvLaluWRuK1Z2feivTSZAIKnOkYeX8N0bKAjE8WS',
      function(_err, res) {
-        // res == true
+         res == true
         console.log('first guess', res)
     });
     bcrypt.compare("veggies",'$2a$10$.x1eL/c.vUkA5ZvLaluWR  uK1Z2feivTSZAIKnOkYeX8N0bKAjE8WS' , function(_err, res) {
