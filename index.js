@@ -72,7 +72,7 @@ app.get('/',(_req, res)=>{
       } catch (error) {
         res.status(500).send(error.message);
       }*/
-    res.send('db.users')})
+    res.send(db.users)})
 app.post('/signin',signin.handleSignin (db, bcrypt ))
 app.post('/signup',(req, res)=>{ signup.handleSignup (req, res, db, bcrypt )})
 app.get('/profile/:id',(req, res)=> {profile.handleProfileGet(req, res, db)})
