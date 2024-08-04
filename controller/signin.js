@@ -1,7 +1,7 @@
 const handleSignin=(db, bcrypt )=>(req, res)=>{
     const {email, password} =req.body;
     if(!email|| !password){
-        return res.status(400).json('incorrect form submission')
+        return res.status(400).json('incorrect form submission');
       }
     /*bcrypt.compare("hj!987&%",'$2a$10$.x1eL/c.vUkA5ZvLaluWRuK1Z2feivTSZAIKnOkYeX8N0bKAjE8WS',
      function(_err, res) {
@@ -27,11 +27,11 @@ const handleSignin=(db, bcrypt )=>(req, res)=>{
     }else {*/
     .catch(_err =>res.status(400).json('unable to get user'))
     }else {
-     res.status(400).json('error loggging in');
+     res.status(400).json('wrong credentials');
     } 
     })
-    .catch(_err =>res.status(400).json('error loggging in'));
+    .catch(_err =>res.status(400).json('wrong credentials'));
     }
     module.exports={
         handleSignin:handleSignin
-        };
+        }
